@@ -54,7 +54,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnStartPause;
     private Button btnNext;
     private Button btnSwitchScreen;
-    private Object data;
 
     /**
      * Find the Views in the layout<br />
@@ -99,8 +98,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         } else if (v == btnSwitchPlayer) {
             // Handle clicks for btnSwitchPlayer
         } else if (v == btnExit) {
+            finish();
             // Handle clicks for btnExit
         } else if (v == btnPre) {
+            setPreVideo();
             // Handle clicks for btnPre
         } else if (v == btnStartPause) {
             if (vv_video.isPlaying()) {
@@ -112,11 +113,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
             // Handle clicks for btnStartPause
         } else if (v == btnNext) {
+            setNextVideo();
             // Handle clicks for btnNext
         } else if (v == btnSwitchScreen) {
             // Handle clicks for btnSwitchScreen
         }
     }
+
 
     private Handler handler = new Handler() {
         @Override
@@ -152,21 +155,27 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         setListener();
 //        vv_video.setVideoURI(uri);
         setData();
-        //获取播放地址
-        vv_video.setVideoURI(uri);
         //设置控制面板
 //        vv_video.setMediaController(new MediaController(this));
     }
 
+
     private void setData() {
-        if(mediaItems!= null && mediaItems.size()>0) {
+        if (mediaItems != null && mediaItems.size() > 0) {
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
 
             vv_video.setVideoPath(mediaItem.getData());
-        }else if(uri != null) {
+        } else if (uri != null) {
             vv_video.setVideoURI(uri);
         }
+        setButtonStatus();
+    }
+
+    private void getData() {
+        uri = getIntent().getData();
+        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
+        position = getIntent().getIntExtra("position", 0);
 
     }
 
@@ -174,89 +183,14 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         utils = new Utils();
 
         receiver = new MyBroadCastReceiver();
-        IntentFilter intentFilter  = new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(receiver,intentFilter);
+        registerReceiver(receiver, intentFilter);
     }
 
-    private void setListener() {
-        //设置监听
-        //播放准备好的监听
-        vv_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                int duration = vv_video.getDuration();
-                seekbarVideo.setMax(duration);
-                tvCurrentTime.setText(utils.stringForTime(duration));
-                vv_video.start();
-                handler.sendEmptyMessage(PROGRESS);
-            }
-        });
-        //播放报错的监听
-        vv_video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                Toast.makeText(SystemVideoPlayerActivity.this, "播放出错", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-        //播放结束的监听
-        vv_video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                Toast.makeText(SystemVideoPlayerActivity.this, "播放结束", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
 
-        seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    vv_video.seekTo(progress);
-                }
-            }
+    class MyBroadCastReceiver extends BroadcastReceiver {
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (handler != null) {
-            //把所有消息移除
-            handler.removeCallbacksAndMessages(null);
-            handler = null;
-        }
-
-        //取消注册
-        if (receiver != null) {
-            unregisterReceiver(receiver);
-            receiver = null;
-        }
-
-        super.onDestroy();
-    }
-
-    public void getData() {
-        uri = getIntent().getData();
-        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
-        position = getIntent().getIntExtra("position",0);
-
-    }
-
-    private class MyBroadCastReceiver extends BroadcastReceiver{
-
-
-        private int batteryView;
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -264,25 +198,150 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             Log.e("TAG", "level==" + level);
             setBatteryView(level);
         }
-
-        public void setBatteryView(int level) {
-            if(level <=0){
+    }
+        private void setBatteryView(int level) {
+            if (level <= 0) {
                 ivBattery.setImageResource(R.drawable.ic_battery_0);
-            }else if(level <= 10){
+            } else if (level <= 10) {
                 ivBattery.setImageResource(R.drawable.ic_battery_10);
-            }else if(level <=20){
+            } else if (level <= 20) {
                 ivBattery.setImageResource(R.drawable.ic_battery_20);
-            }else if(level <=40){
+            } else if (level <= 40) {
                 ivBattery.setImageResource(R.drawable.ic_battery_40);
-            }else if(level <=60){
+            } else if (level <= 60) {
                 ivBattery.setImageResource(R.drawable.ic_battery_60);
-            }else if(level <=80){
+            } else if (level <= 80) {
                 ivBattery.setImageResource(R.drawable.ic_battery_80);
-            }else if(level <=100){
+            } else if (level <= 100) {
                 ivBattery.setImageResource(R.drawable.ic_battery_100);
-            }else {
+            } else {
                 ivBattery.setImageResource(R.drawable.ic_battery_100);
             }
         }
+
+        private void setListener() {
+            //设置监听
+            //播放准备好的监听
+            vv_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    int duration = vv_video.getDuration();
+                    seekbarVideo.setMax(duration);
+                    tvDuration.setText(utils.stringForTime(duration));
+                    vv_video.start();
+                    handler.sendEmptyMessage(PROGRESS);
+                }
+            });
+            //播放报错的监听
+            vv_video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Toast.makeText(SystemVideoPlayerActivity.this, "播放出错", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+            //播放结束的监听
+            vv_video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+//                Toast.makeText(SystemVideoPlayerActivity.this, "播放结束", Toast.LENGTH_SHORT).show();
+//                finish();
+                    setNextVideo();
+                }
+            });
+
+            seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        vv_video.seekTo(progress);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+        }
+
+        private void setPreVideo() {
+            position--;
+            if (position > 0) {
+                MediaItem mediaItem = mediaItems.get(position);
+                vv_video.setVideoPath(mediaItem.getData());
+                tvName.setText(mediaItem.getName());
+                setButtonStatus();
+            }
+        }
+
+        private void setNextVideo() {
+            position++;
+            if (position < mediaItems.size()) {
+                MediaItem mediaItem = mediaItems.get(position);
+                vv_video.setVideoPath(mediaItem.getData());
+                tvName.setText(mediaItem.getName());
+                setButtonStatus();
+            } else {
+                Toast.makeText(this, "退出播放器", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
+        private void setButtonStatus() {
+            if (mediaItems != null && mediaItems.size() > 0) {
+                //有视频播放
+                setEnable(true);
+
+                if (position == 0) {
+                    btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
+                    btnPre.setEnabled(false);
+                }
+
+                if (position == mediaItems.size() - 1) {
+                    btnNext.setBackgroundResource(R.drawable.btn_next_gray);
+                    btnNext.setEnabled(false);
+                }
+
+            } else if (uri != null) {
+                //上一个和下一个不可用点击
+                setEnable(false);
+            }
+        }
+
+        private void setEnable(boolean enable) {
+            if (enable) {
+                //上一个和下一个都可以点击
+                btnPre.setBackgroundResource(R.drawable.btn_pre_selector);
+                btnNext.setBackgroundResource(R.drawable.btn_next_selector);
+            } else {
+                //上一个和下一个灰色，并且不可用点击
+                btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
+                btnNext.setBackgroundResource(R.drawable.btn_next_gray);
+            }
+            btnPre.setEnabled(enable);
+            btnNext.setEnabled(enable);
+        }
+
+        @Override
+        protected void onDestroy() {
+            if (handler != null) {
+                //把所有消息移除
+                handler.removeCallbacksAndMessages(null);
+                handler = null;
+            }
+
+            //取消注册
+            if (receiver != null) {
+                unregisterReceiver(receiver);
+                receiver = null;
+            }
+
+            super.onDestroy();
+        }
     }
-}
