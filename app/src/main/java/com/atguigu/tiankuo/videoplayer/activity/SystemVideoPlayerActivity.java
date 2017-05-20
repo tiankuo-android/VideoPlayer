@@ -84,6 +84,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         } else if ( v == btnPre ) {
             // Handle clicks for btnPre
         } else if ( v == btnStartPause ) {
+            if(vv_video.isPlaying()) {
+                vv_video.pause();
+                btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
+            }else{
+                vv_video.start();
+                btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
+            }
             // Handle clicks for btnStartPause
         } else if ( v == btnNext ) {
             // Handle clicks for btnNext
@@ -102,14 +109,27 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
 
         findViews();
-
+        //得到播放地址
         uri = getIntent().getData();
+        setListener();
+        vv_video.setVideoURI(uri);
+
+        //获取播放地址
+        vv_video.setVideoURI(uri);
+        //设置控制面板
+//        vv_video.setMediaController(new MediaController(this));
+    }
+
+    private void setListener() {
         //设置监听
         //播放准备好的监听
         vv_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-             vv_video.start();
+                int duration = vv_video.getDuration();
+                seekbarVideo.setMax(duration);
+                vv_video.start();
+
             }
         });
         //播放报错的监听
@@ -123,14 +143,29 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         //播放结束的监听
         vv_video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-           public void onCompletion(MediaPlayer mp) {
-            Toast.makeText(SystemVideoPlayerActivity.this, "播放结束", Toast.LENGTH_SHORT).show();
+            public void onCompletion(MediaPlayer mp) {
+                Toast.makeText(SystemVideoPlayerActivity.this, "播放结束", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
-        //获取播放地址
-        vv_video.setVideoURI(uri);
-        //设置控制面板
-//        vv_video.setMediaController(new MediaController(this));
+
+        seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser) {
+                    vv_video.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 }
