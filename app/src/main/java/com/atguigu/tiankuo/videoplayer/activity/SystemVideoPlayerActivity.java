@@ -1,11 +1,16 @@
 package com.atguigu.tiankuo.videoplayer.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,12 +23,16 @@ import android.widget.VideoView;
 import com.atguigu.tiankuo.videoplayer.R;
 import com.atguigu.tiankuo.videoplayer.utils.Utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class SystemVideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
 
     private VideoView vv_video;
     private Uri uri;
     private Utils utils;
     private static final int PROGRESS = 0;
+    private MyBroadCastReceiver receiver;
 
     private LinearLayout llTop;
     private TextView tvName;
@@ -113,17 +122,24 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     int currentPosition = vv_video.getCurrentPosition();
                     seekbarVideo.setProgress(currentPosition);
                     tvCurrentTime.setText(utils.stringForTime(currentPosition));
+                    tvSystemTime.setText(getSystemTime());
                     sendEmptyMessageDelayed(PROGRESS, 1000);
                     break;
             }
         }
     };
 
+    private String getSystemTime() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        return format.format(new Date());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        utils = new Utils();
+
+//        utils = new Utils();
+        initData();
         findViews();
         //得到播放地址
         uri = getIntent().getData();
@@ -134,6 +150,15 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv_video.setVideoURI(uri);
         //设置控制面板
 //        vv_video.setMediaController(new MediaController(this));
+    }
+
+    private void initData() {
+        utils = new Utils();
+
+        receiver = new MyBroadCastReceiver();
+        IntentFilter intentFilter  = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(receiver,intentFilter);
     }
 
     private void setListener() {
@@ -188,7 +213,50 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     @Override
     protected void onDestroy() {
+        if (handler != null) {
+            //把所有消息移除
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
+        }
+
+        //取消注册
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+            receiver = null;
+        }
+
         super.onDestroy();
-        handler.removeCallbacksAndMessages(null);
+    }
+    private class MyBroadCastReceiver extends BroadcastReceiver{
+
+
+        private int batteryView;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra("level", 0);
+            Log.e("TAG", "level==" + level);
+            setBatteryView(level);
+        }
+
+        public void setBatteryView(int level) {
+            if(level <=0){
+                ivBattery.setImageResource(R.drawable.ic_battery_0);
+            }else if(level <= 10){
+                ivBattery.setImageResource(R.drawable.ic_battery_10);
+            }else if(level <=20){
+                ivBattery.setImageResource(R.drawable.ic_battery_20);
+            }else if(level <=40){
+                ivBattery.setImageResource(R.drawable.ic_battery_40);
+            }else if(level <=60){
+                ivBattery.setImageResource(R.drawable.ic_battery_60);
+            }else if(level <=80){
+                ivBattery.setImageResource(R.drawable.ic_battery_80);
+            }else if(level <=100){
+                ivBattery.setImageResource(R.drawable.ic_battery_100);
+            }else {
+                ivBattery.setImageResource(R.drawable.ic_battery_100);
+            }
+        }
     }
 }
