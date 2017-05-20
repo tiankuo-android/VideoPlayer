@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -12,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atguigu.tiankuo.videoplayer.R;
 import com.atguigu.tiankuo.videoplayer.activity.SystemVideoPlayerActivity;
@@ -50,11 +50,19 @@ public class LocalVideoPager extends BaseFragment {
                 //得到点击item对应的对象
 //                MediaItem mediaItem = mediaItems.get(position);
 
-                MediaItem item = adapter.getItem(position);
-                Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
+//                MediaItem item = adapter.getItem(position);
+//                Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
+//
+//                Intent intent  = new Intent(context, SystemVideoPlayerActivity.class);
+//                intent.setDataAndType(Uri.parse(item.getData()),"vidio/*");
 
-                Intent intent  = new Intent(context, SystemVideoPlayerActivity.class);
-                intent.setDataAndType(Uri.parse(item.getData()),"vidio/*");
+
+                Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("videolist",mediaItems);
+                intent.putExtra("position",position);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
