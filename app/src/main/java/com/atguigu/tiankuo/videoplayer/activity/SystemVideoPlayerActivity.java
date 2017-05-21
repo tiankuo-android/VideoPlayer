@@ -55,6 +55,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private int maxVoice;
     private boolean isMute = false;
 
+    private  float startY;
+    private float touchRang;
+    private  int mVol;
+
     private LinearLayout llTop;
     private TextView tvName;
     private ImageView ivBattery;
@@ -310,6 +314,35 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     public boolean onTouchEvent(MotionEvent event) {
         //把事件交给手势识别器解析
         detector.onTouchEvent(event);
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN://手指按下屏幕
+                //1.记录相关的值
+                startY = event.getY();
+                touchRang =Math.min(screenWidth, screenHeight);//screenHeight
+                mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
+                break;
+            case MotionEvent.ACTION_MOVE://手指在屏幕上移动
+                //2.来到结束的坐标
+                float endY = event.getY();
+                //3.计算偏移量
+                float distanceY = startY - endY;
+
+                //要改变的声音 = (滑动的距离 / 总距离)*最大音量
+                float delta = (distanceY/touchRang)*maxVoice;
+                //最终声音 = 原来的声音 + 要改变的声音
+                float volume = Math.min(Math.max(mVol+delta,0),maxVoice);
+                if(delta != 0){
+                    updateVoiceProgress((int) volume);
+                }
+
+//                startY = event.getY();
+                break;
+
+            case MotionEvent.ACTION_UP://手指离开屏幕
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,5000);
+                break;
+        }
         return super.onTouchEvent(event);
     }
 
