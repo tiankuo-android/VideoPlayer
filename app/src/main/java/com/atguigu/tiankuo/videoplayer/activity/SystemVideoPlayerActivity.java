@@ -49,6 +49,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private int screenWidth;
     private int videoWidth;
     private int videoHeight;
+
     private int currentVoice;
     private AudioManager am;
     private int maxVoice;
@@ -105,6 +106,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         btnStartPause.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnSwitchScreen.setOnClickListener(this);
+
+        seekbarVoice.setMax(maxVoice);
+        seekbarVoice.setProgress(currentVoice);
     }
 
 
@@ -112,6 +116,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     public void onClick(View v) {
         if (v == btnVoice) {
             // Handle clicks for btnVoice
+            isMute = !isMute;
+            updateVoice(isMute);
+
         } else if (v == btnSwitchPlayer) {
             // Handle clicks for btnSwitchPlayer
         } else if (v == btnExit) {
@@ -136,6 +143,20 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
     }
+
+    private void updateVoice(boolean isMute) {
+        if(isMute){
+            //静音
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+            seekbarVoice.setProgress(0);
+        }else{
+            //非静音
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+            seekbarVoice.setProgress(currentVoice);
+        }
+    }
+
+
     public void setVideoType(int videoType) {
         switch (videoType) {
             case FULL_SCREEN:
@@ -278,6 +299,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
 
     }
 
@@ -387,6 +412,74 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             }
         });
+
+        //设置Seekbar状态改变的监听
+        seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            /**
+             *
+             * @param seekBar
+             * @param progress
+             * @param fromUser true:用户拖动改变的，false:系统更新改变的
+             */
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    vv_video.seekTo(progress);
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+            }
+        });
+
+        //监听拖动声音
+        seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser){
+                    updateVoiceProgress(progress);
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    /**
+     * 设置滑动改变声音
+     * @param progress
+     */
+    private void updateVoiceProgress(int progress) {
+        currentVoice = progress;
+        //真正改变声音
+        am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+        //改变进度条
+        seekbarVoice.setProgress(currentVoice);
+        if(currentVoice <=0){
+            isMute = true;
+        }else {
+            isMute = false;
+        }
+
+
     }
 
     private void setPreVideo() {
