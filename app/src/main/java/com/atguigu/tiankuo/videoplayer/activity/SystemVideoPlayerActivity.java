@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,13 +52,17 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private int videoHeight;
 
     private int currentVoice;
+    private int currentVoice1;
     private AudioManager am;
+    private WindowManager wm;
     private int maxVoice;
     private boolean isMute = false;
 
-    private  float startY;
+    private float startY;
+    private float startY1;
     private float touchRang;
-    private  int mVol;
+    private int mVol;
+    private float touchX;
 
     private LinearLayout llTop;
     private TextView tvName;
@@ -102,6 +107,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         btnNext = (Button) findViewById(R.id.btn_next);
         btnSwitchScreen = (Button) findViewById(R.id.btn_switch_screen);
         vv_video = (com.atguigu.tiankuo.videoplayer.utils.VideoView) findViewById(R.id.vv_video);
+
 
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
@@ -149,13 +155,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
     private void updateVoice(boolean isMute) {
-        if(isMute){
+        if (isMute) {
             //静音
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             seekbarVoice.setProgress(0);
-        }else{
+        } else {
             //非静音
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVoice, 0);
             seekbarVoice.setProgress(currentVoice);
         }
     }
@@ -187,6 +193,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 break;
         }
     }
+
     private void setStartOrPause() {
         if (vv_video.isPlaying()) {
             vv_video.pause();
@@ -303,44 +310,50 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
-        am = (AudioManager) getSystemService(AUDIO_SERVICE);
-        currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-        maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
-
+//        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+//        currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+//        maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //把事件交给手势识别器解析
         detector.onTouchEvent(event);
-        switch (event.getAction()){
+
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN://手指按下屏幕
                 //1.记录相关的值
+                touchX = event.getX();
                 startY = event.getY();
-                touchRang =Math.min(screenWidth, screenHeight);//screenHeight
+                touchRang = Math.min(screenWidth, screenHeight);//screenHeight
                 mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
                 handler.removeMessages(HIDE_MEDIACONTROLLER);
                 break;
             case MotionEvent.ACTION_MOVE://手指在屏幕上移动
-                //2.来到结束的坐标
                 float endY = event.getY();
-                //3.计算偏移量
                 float distanceY = startY - endY;
+                if (touchX > screenWidth / 2) {
 
-                //要改变的声音 = (滑动的距离 / 总距离)*最大音量
-                float delta = (distanceY/touchRang)*maxVoice;
-                //最终声音 = 原来的声音 + 要改变的声音
-                float volume = Math.min(Math.max(mVol+delta,0),maxVoice);
-                if(delta != 0){
-                    updateVoiceProgress((int) volume);
+                    float delta = (distanceY / touchRang) * maxVoice;
+                    float volume = Math.min(Math.max(mVol + delta, 0), maxVoice);
+                    if (delta != 0) {
+                        updateVoiceProgress((int) volume);
+                    }
+                } else if (touchX <= screenWidth / 2) {
+
+                    final double FLING_MIN_DISTANCE = 0.5;
+                    final double FLING_MIN_VELOCITY = 0.5;
+                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(10);
+                    }
+                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(-10);
+                    }
                 }
-
-//                startY = event.getY();
                 break;
 
             case MotionEvent.ACTION_UP://手指离开屏幕
-                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,5000);
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 5000);
                 break;
         }
         return super.onTouchEvent(event);
@@ -361,8 +374,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
 
-
-
     class MyBroadCastReceiver extends BroadcastReceiver {
 
 
@@ -372,6 +383,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             Log.e("TAG", "level==" + level);
             setBatteryView(level);
         }
+
     }
 
     private void setBatteryView(int level) {
@@ -478,7 +490,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     updateVoiceProgress(progress);
                 }
 
@@ -498,21 +510,32 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     /**
      * 设置滑动改变声音
+     *
      * @param progress
      */
     private void updateVoiceProgress(int progress) {
         currentVoice = progress;
         //真正改变声音
-        am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVoice, 0);
         //改变进度条
         seekbarVoice.setProgress(currentVoice);
-        if(currentVoice <=0){
+        if (currentVoice <= 0) {
             isMute = true;
-        }else {
+        } else {
             isMute = false;
         }
+    }
 
-
+    //设置滑动改变亮度
+    public void setBrightness(float brightness) {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = lp.screenBrightness + brightness / 255.0f;
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1;
+        } else if (lp.screenBrightness < 0.1) {
+            lp.screenBrightness = (float) 0.1;
+        }
+        getWindow().setAttributes(lp);
     }
 
     private void setPreVideo() {
