@@ -2,6 +2,7 @@ package com.atguigu.tiankuo.videoplayer.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -116,8 +118,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv_video = (VideoView) findViewById(R.id.vv_video);
         ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
-        ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
-        tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
+        ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
+        tv_loading_net_speed = (TextView) findViewById(R.id.tv_loading_net_speed);
 
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
@@ -161,6 +163,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
 
         }
+
 
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
@@ -223,11 +226,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             super.handleMessage(msg);
             switch (msg.what) {
                 case SHOW_NET_SPEED:
-                    if(isNetUri){
+                    if (isNetUri) {
                         String netSpeed = utils.getNetSpeed(SystemVideoPlayerActivity.this);
-                        tv_loading_net_speed.setText("正在加载中...."+netSpeed);
-                        tv_net_speed.setText("正在缓冲...."+netSpeed);
-                        sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
+                        tv_loading_net_speed.setText("正在加载中...." + netSpeed);
+                        tv_net_speed.setText("正在缓冲...." + netSpeed);
+                        sendEmptyMessageDelayed(SHOW_NET_SPEED, 1000);
                     }
                     break;
                 case PROGRESS:
@@ -236,21 +239,21 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     tvCurrentTime.setText(utils.stringForTime(currentPosition));
                     tvSystemTime.setText(getSystemTime());
 
-                    if(isNetUri){
+                    if (isNetUri) {
                         int bufferPercentage = vv_video.getBufferPercentage();//0~100;
-                        int totalBuffer = bufferPercentage*seekbarVideo.getMax();
-                        int secondaryProgress =totalBuffer/100;
+                        int totalBuffer = bufferPercentage * seekbarVideo.getMax();
+                        int secondaryProgress = totalBuffer / 100;
                         seekbarVideo.setSecondaryProgress(secondaryProgress);
-                    }else{
+                    } else {
                         seekbarVideo.setSecondaryProgress(0);
                     }
-                    if(isNetUri && vv_video.isPlaying()){
+                    if (isNetUri && vv_video.isPlaying()) {
 
                         int duration = currentPosition - preCurrentPosition;
-                        if(duration <500){
+                        if (duration < 500) {
                             //卡
                             ll_buffering.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             //不卡
                             ll_buffering.setVisibility(View.GONE);
                         }
@@ -290,11 +293,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
             vv_video.setVideoPath(mediaItem.getData());
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
         } else if (uri != null) {
             vv_video.setVideoURI(uri);
             tvName.setText(uri.toString());
-            isNetUri =  utils.isNetUri(uri.toString());
+            isNetUri = utils.isNetUri(uri.toString());
         }
         setButtonStatus();
     }
@@ -476,7 +479,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 Toast.makeText(SystemVideoPlayerActivity.this, "播放出错", Toast.LENGTH_SHORT).show();
-                startVitamioPlayer();
+//                startVitamioPlayer();
+                showErrorDialog();
                 return false;
             }
         });
@@ -555,18 +559,32 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
         });
     }
+
+    private void showErrorDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前视频不可播放，请检查网络或者视频文件是否有损坏！")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
+    }
+
     private void startVitamioPlayer() {
-        if(vv_video != null){
+        if (vv_video != null) {
             vv_video.stopPlayback();
         }
         Intent intent = new Intent(this, VitamioVideoPlayerActivity.class);
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
             Bundle bunlder = new Bundle();
-            bunlder.putSerializable("videolist",mediaItems);
-            intent.putExtra("position",position);
+            bunlder.putSerializable("videolist", mediaItems);
+            intent.putExtra("position", position);
             //放入Bundler
             intent.putExtras(bunlder);
-        }else if(uri != null){
+        } else if (uri != null) {
             intent.setData(uri);
         }
         startActivity(intent);
@@ -607,7 +625,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         position--;
         if (position > 0) {
             MediaItem mediaItem = mediaItems.get(position);
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
             ll_loading.setVisibility(View.VISIBLE);
             vv_video.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
@@ -619,7 +637,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         position++;
         if (position < mediaItems.size()) {
             MediaItem mediaItem = mediaItems.get(position);
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
             ll_loading.setVisibility(View.VISIBLE);
             vv_video.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
