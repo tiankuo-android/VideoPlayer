@@ -2,6 +2,7 @@ package com.atguigu.tiankuo.videoplayer.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -173,6 +175,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         } else if (v == btnSwitchPlayer) {
             // Handle clicks for btnSwitchPlayer
+            switchPlayer();
         } else if (v == btnExit) {
             finish();
             // Handle clicks for btnExit
@@ -198,6 +201,20 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+    }
+
+    private void switchPlayer() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前使用系统播放器播放，当播放有声音没有画面，请切换到万能播放器播放")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startVitamioPlayer();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private void updateVoice(boolean isMute) {
@@ -681,7 +698,21 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     }
 
     private void startVitamioPlayer() {
-
+        if(vv != null){
+            vv.stopPlayback();
+        }
+        Intent intent = new Intent(this, VitamioVideoPlayerActivity.class);
+        if(mediaItems != null && mediaItems.size() >0){
+            Bundle bunlder = new Bundle();
+            bunlder.putSerializable("videolist",mediaItems);
+            intent.putExtra("position",position);
+            //放入Bundler
+            intent.putExtras(bunlder);
+        }else if(uri != null){
+            intent.setData(uri);
+        }
+        startActivity(intent);
+        finish();//关闭系统播放器
     }
 
     /**

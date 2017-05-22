@@ -145,6 +145,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         } else if (v == btnSwitchPlayer) {
             // Handle clicks for btnSwitchPlayer
+            switchPlayer();
         } else if (v == btnExit) {
             finish();
             // Handle clicks for btnExit
@@ -167,6 +168,19 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+    }
+    private void switchPlayer() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前使用系统播放器播放，当播放有声音没有画面，请切换到万能播放器播放")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startVitamioPlayer();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private void updateVoice(boolean isMute) {
