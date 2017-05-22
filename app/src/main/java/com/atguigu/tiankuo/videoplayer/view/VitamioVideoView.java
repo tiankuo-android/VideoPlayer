@@ -1,4 +1,4 @@
-package com.atguigu.tiankuo.videoplayer.utils;
+package com.atguigu.tiankuo.videoplayer.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
  * 作用：
  */
 
-public class VideoView extends android.widget.VideoView {
+public class VitamioVideoView extends io.vov.vitamio.widget.VideoView {
 
     /**
      * 带有两个参数的构造方法
@@ -19,7 +19,7 @@ public class VideoView extends android.widget.VideoView {
      * @param context
      * @param attrs
      */
-    public VideoView(Context context, AttributeSet attrs) {
+    public VitamioVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
