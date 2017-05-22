@@ -206,7 +206,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     private void switchPlayer() {
         new AlertDialog.Builder(this)
                 .setTitle("提示")
-                .setMessage("当前使用系统播放器播放，当播放有声音没有画面，请切换到万能播放器播放")
+                .setMessage("当前使用万能播放器播放，当播放画面有色快，请切换到系统播放器播放")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -701,7 +701,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         if(vv != null){
             vv.stopPlayback();
         }
-        Intent intent = new Intent(this, VitamioVideoPlayerActivity.class);
+        Intent intent = new Intent(this, SystemVideoPlayerActivity.class);
         if(mediaItems != null && mediaItems.size() >0){
             Bundle bunlder = new Bundle();
             bunlder.putSerializable("videolist",mediaItems);
