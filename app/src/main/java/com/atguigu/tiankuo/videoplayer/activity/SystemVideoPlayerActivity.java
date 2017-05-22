@@ -250,6 +250,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             vv_video.setVideoPath(mediaItem.getData());
         } else if (uri != null) {
             vv_video.setVideoURI(uri);
+            tvName.setText(uri.toString());
+//            isNetUri =  utils.isNetUri(uri.toString());
         }
         setButtonStatus();
     }
