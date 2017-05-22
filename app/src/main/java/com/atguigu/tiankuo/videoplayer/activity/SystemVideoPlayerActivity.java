@@ -91,12 +91,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnSwitchScreen;
     private int videoType;
 
-    /**
-     * Find the Views in the layout<br />
-     * <br />
-     * Auto-created on 2017-05-20 11:35:22 by Android Layout Finder
-     * (http://www.buzzingandroid.com/tools/android-layout-finder)
-     */
     private void findViews() {
         setContentView(R.layout.activity_system_video_player);
         llTop = (LinearLayout) findViewById(R.id.ll_top);
