@@ -169,6 +169,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
     }
+
     private void switchPlayer() {
         new AlertDialog.Builder(this)
                 .setTitle("提示")
@@ -486,6 +487,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 hideMediaController();
 
                 setVideoType(DEFUALT_SCREEN);
+                if (vv_video.isPlaying()) {
+                    //设置暂停
+                    btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
+                } else {
+                    btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
+                }
 
             }
         });
