@@ -2,13 +2,6 @@ package com.atguigu.tiankuo.videoplayer.domain;
 
 import java.util.List;
 
-/**
- * 作者：杨光福 on 2017/5/22 17:00
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
-
 public class MoveInfo {
 
     private List<TrailersBean> trailers;

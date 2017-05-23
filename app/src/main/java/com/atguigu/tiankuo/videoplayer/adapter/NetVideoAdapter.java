@@ -11,11 +11,10 @@ import com.atguigu.tiankuo.videoplayer.R;
 import com.atguigu.tiankuo.videoplayer.domain.MoveInfo;
 import com.atguigu.tiankuo.videoplayer.utils.Utils;
 
-
-import java.util.List;
-
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
+
+import java.util.List;
 
 /**
  * 作者：杨光福 on 2017/5/19 15:44
@@ -35,7 +34,7 @@ public class NetVideoAdapter extends BaseAdapter {
         this.datas = datas;
         utils = new Utils();
         imageOptions = new ImageOptions.Builder()
-                .setIgnoreGif(false)//是否忽略gif图。false表示不忽略。不写这句，默认是true
+                .setIgnoreGif(false)
                 .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                 .setFailureDrawableId(R.drawable.video_default)
                 .setLoadingDrawableId(R.drawable.video_default)

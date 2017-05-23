@@ -22,20 +22,11 @@ import org.xutils.x;
 import java.util.List;
 
 
-
-/**
- * 作者：杨光福 on 2017/5/19 11:47
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
-
 public class NetVideoPager extends BaseFragment {
     private NetVideoAdapter adapter;
 
     private ListView lv;
     private TextView tv_nodata;
-    //重写视图
     @Override
     public View initView() {
         Log.e("TAG","NetVideoPager-initView");
@@ -66,7 +57,6 @@ public class NetVideoPager extends BaseFragment {
 
     private void getDataFromNet() {
 
-        //配置联网请求地址
         final RequestParams request = new RequestParams("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
         x.http().get(request, new Callback.CommonCallback<String>() {
             @Override
@@ -94,16 +84,11 @@ public class NetVideoPager extends BaseFragment {
 
     }
 
-    /**
-     * 解析json数据和显示数据
-     * @param json
-     */
     private void processData(String json) {
         MoveInfo moveInfo = new Gson().fromJson(json, MoveInfo.class);
         List<MoveInfo.TrailersBean> datas = moveInfo.getTrailers();
         if(datas != null && datas.size() >0){
             tv_nodata.setVisibility(View.GONE);
-            //有数据-适配器
             adapter = new NetVideoAdapter(context,datas);
             lv.setAdapter(adapter);
         }else{
