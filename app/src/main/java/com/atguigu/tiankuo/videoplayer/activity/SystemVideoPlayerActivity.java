@@ -271,6 +271,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     }
 
 
+                    handler.removeMessages(PROGRESS);
                     sendEmptyMessageDelayed(PROGRESS, 1000);
                     break;
                 case HIDE_MEDIACONTROLLER:

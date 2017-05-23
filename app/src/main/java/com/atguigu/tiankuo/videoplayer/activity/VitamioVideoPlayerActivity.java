@@ -767,14 +767,10 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
             //设置按钮状态
             setButtonStatus();
 
-
         } else {
             Toast.makeText(this, "退出播放器", Toast.LENGTH_SHORT).show();
             finish();
-
-
         }
-
     }
 
     private void setButtonStatus() {

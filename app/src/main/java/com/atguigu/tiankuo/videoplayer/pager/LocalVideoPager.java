@@ -22,12 +22,6 @@ import com.atguigu.tiankuo.videoplayer.fragment.BaseFragment;
 
 import java.util.ArrayList;
 
-/**
- * 作者：杨光福 on 2017/5/19 11:47
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
 
 public class LocalVideoPager extends BaseFragment {
 
