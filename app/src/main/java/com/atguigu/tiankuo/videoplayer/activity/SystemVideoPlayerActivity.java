@@ -249,7 +249,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     tvSystemTime.setText(getSystemTime());
 
                     if (isNetUri) {
-                        int bufferPercentage = vv_video.getBufferPercentage();//0~100;
+                        int bufferPercentage = vv_video.getBufferPercentage();
                         int totalBuffer = bufferPercentage * seekbarVideo.getMax();
                         int secondaryProgress = totalBuffer / 100;
                         seekbarVideo.setSecondaryProgress(secondaryProgress);
@@ -260,17 +260,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
                         int duration = currentPosition - preCurrentPosition;
                         if (duration < 500) {
-                            //卡
                             ll_buffering.setVisibility(View.VISIBLE);
                         } else {
-                            //不卡
                             ll_buffering.setVisibility(View.GONE);
                         }
-
                         preCurrentPosition = currentPosition;
                     }
-
-
                     handler.removeMessages(PROGRESS);
                     sendEmptyMessageDelayed(PROGRESS, 1000);
                     break;
@@ -507,39 +502,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
         });
 
-        seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    vv_video.seekTo(progress);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                handler.removeMessages(HIDE_MEDIACONTROLLER);
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
-            }
-        });
-
         //设置Seekbar状态改变的监听
         seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            /**
-             *
-             * @param seekBar
-             * @param progress
-             * @param fromUser true:用户拖动改变的，false:系统更新改变的
-             */
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     vv_video.seekTo(progress);
                 }
-
             }
 
             @Override
@@ -561,33 +530,28 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 if (fromUser) {
                     updateVoiceProgress(progress);
                 }
-
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
     }
 
-    private void showErrorDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("提示")
-                .setMessage("当前视频不可播放，请检查网络或者视频文件是否有损坏！")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .show();
-    }
+//    private void showErrorDialog() {
+//        new AlertDialog.Builder(this)
+//                .setTitle("提示")
+//                .setMessage("当前视频不可播放，请检查网络或者视频文件是否有损坏！")
+//                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        finish();
+//                    }
+//                })
+//                .show();
+//    }
 
     private void startVitamioPlayer() {
         if (vv_video != null) {
@@ -607,11 +571,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         finish();//关闭系统播放器
     }
 
-    /**
-     * 设置滑动改变声音
-     *
-     * @param progress
-     */
     private void updateVoiceProgress(int progress) {
         currentVoice = progress;
         //真正改变声音

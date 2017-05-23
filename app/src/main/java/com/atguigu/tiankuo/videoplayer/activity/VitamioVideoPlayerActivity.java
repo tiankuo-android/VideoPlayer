@@ -18,6 +18,7 @@ import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,7 +82,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     private int position;
     //手势识别器
     private GestureDetector detector;
-
      //是否全屏
     private boolean isFullScreen = false;
     //屏幕的高
@@ -90,15 +90,12 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     //视频的原生的宽和高
     private int videoWidth;
     private int videoHeight;
-
-    //当前的音量：0~15之间
     private int currentVoice;
     private AudioManager am;
-    //最大音量
     private int maxVoice;
-    //是否静音
     private boolean isMute = false;
     private boolean isNetUri = true;
+    private float touchX;
 
     private void findViews() {
         //初始化解码器
@@ -426,33 +423,41 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     public boolean onTouchEvent(MotionEvent event) {
         //把事件交给手势识别器解析
         detector.onTouchEvent(event);
+
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                //1.记录相关参数
+            case MotionEvent.ACTION_DOWN://手指按下屏幕
+                //1.记录相关的值
+                touchX = event.getX();
                 dowY = event.getY();
+                touchRang = Math.min(screenWidth, screenHeight);//screenHeight
                 mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-                touchRang = Math.min(screenHeight, screenWidth);//screenHeight
                 handler.removeMessages(HIDE_MEDIACONTROLLER);
                 break;
-            case MotionEvent.ACTION_MOVE:
-                //2.滑动的时候来到新的位置
+            case MotionEvent.ACTION_MOVE://手指在屏幕上移动
                 float endY = event.getY();
-                //3.计算滑动的距离
                 float distanceY = dowY - endY;
-                //原理：在屏幕滑动的距离： 滑动的总距离 = 要改变的声音： 最大声音
-                //要改变的声音 = （在屏幕滑动的距离/ 滑动的总距离）*最大声音;
-                float delta = (distanceY / touchRang) * maxVoice;
+                if (touchX > screenWidth / 2) {
 
-                if (delta != 0) {
-                    //最终声音 = 原来的+ 要改变的声音
-                    int mVoice = (int) Math.min(Math.max(mVol + delta, 0), maxVoice);
-                    //0~15
+                    float delta = (distanceY / touchRang) * maxVoice;
+                    float volume = Math.min(Math.max(mVol + delta, 0), maxVoice);
+                    if (delta != 0) {
+                        updateVoiceProgress((int) volume);
+                    }
+                } else if (touchX <= screenWidth / 2) {
 
-                    updateVoiceProgress(mVoice);
+                    final double FLING_MIN_DISTANCE = 0.5;
+                    final double FLING_MIN_VELOCITY = 0.5;
+                    if (distanceY > FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(20);
+                    }
+                    if (distanceY < FLING_MIN_DISTANCE && Math.abs(distanceY) > FLING_MIN_VELOCITY) {
+                        setBrightness(-20);
+                    }
                 }
                 break;
-            case MotionEvent.ACTION_UP:
-                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+
+            case MotionEvent.ACTION_UP://手指离开屏幕
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 5000);
                 break;
         }
         return super.onTouchEvent(event);
@@ -654,6 +659,18 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         } else {
             isMute = false;
         }
+    }
+
+    //设置滑动改变亮度
+    public void setBrightness(float brightness) {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = lp.screenBrightness + brightness / 255.0f;
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1;
+        } else if (lp.screenBrightness < 0.1) {
+            lp.screenBrightness = (float) 0.1;
+        }
+        getWindow().setAttributes(lp);
     }
 
     private void setPreVideo() {
