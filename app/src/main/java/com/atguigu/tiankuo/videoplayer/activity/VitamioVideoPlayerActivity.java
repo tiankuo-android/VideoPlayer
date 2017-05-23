@@ -77,20 +77,14 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     private TextView tv_net_speed;
     private Utils utils;
     private MyBroadCastReceiver receiver;
-    /**
-     * 视频列表的位置
-     */
+     //视频列表的位置
     private int position;
     //手势识别器
     private GestureDetector detector;
 
-    /**
-     * 是否全屏
-     */
+     //是否全屏
     private boolean isFullScreen = false;
-    /**
-     * 屏幕的高
-     */
+    //屏幕的高
     private int screenHeight;
     private int screenWidth;
     //视频的原生的宽和高
@@ -104,17 +98,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     private int maxVoice;
     //是否静音
     private boolean isMute = false;
-    /**
-     * 是否是网络资源
-     */
     private boolean isNetUri = true;
 
-    /**
-     * Find the Views in the layout<br />
-     * <br />
-     * Auto-created on 2017-05-20 11:01:51 by Android Layout Finder
-     * (http://www.buzzingandroid.com/tools/android-layout-finder)
-     */
     private void findViews() {
         //初始化解码器
         Vitamio.isInitialized(getApplicationContext());
@@ -138,8 +123,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         vv = (VitamioVideoView) findViewById(R.id.vv);
         ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
-        ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
-        tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
+        ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
+        tv_loading_net_speed = (TextView) findViewById(R.id.tv_loading_net_speed);
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
         btnExit.setOnClickListener(this);
@@ -158,12 +143,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     }
 
 
-    /**
-     * Handle button click events<br />
-     * <br />
-     * Auto-created on 2017-05-20 11:01:51 by Android Layout Finder
-     * (http://www.buzzingandroid.com/tools/android-layout-finder)
-     */
     @Override
     public void onClick(View v) {
         if (v == btnVoice) {
@@ -229,11 +208,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         }
     }
 
-    /**
-     * 设置视频的全屏和默认
-     *
-     * @param videoType
-     */
     private void setVideoType(int videoType) {
         switch (videoType) {
             case FULL_SCREEN:
@@ -256,12 +230,9 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 int width = screenWidth;
                 int height = screenHeight;
 
-                // for compatibility, we adjust size based on aspect ratio
                 if (mVideoWidth * height < width * mVideoHeight) {
-                    //Log.i("@@@", "image too wide, correcting");
                     width = height * mVideoWidth / mVideoHeight;
                 } else if (mVideoWidth * height > width * mVideoHeight) {
-                    //Log.i("@@@", "image too tall, correcting");
                     height = width * mVideoHeight / mVideoWidth;
                 }
                 vv.setVideoSize(width, height);
@@ -292,11 +263,11 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
             super.handleMessage(msg);
             switch (msg.what) {
                 case SHOW_NET_SPEED:
-                    if(isNetUri){
+                    if (isNetUri) {
                         String netSpeed = utils.getNetSpeed(VitamioVideoPlayerActivity.this);
-                        tv_loading_net_speed.setText("正在加载中...."+netSpeed);
-                        tv_net_speed.setText("正在缓冲...."+netSpeed);
-                        sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
+                        tv_loading_net_speed.setText("正在加载中...." + netSpeed);
+                        tv_net_speed.setText("正在缓冲...." + netSpeed);
+                        sendEmptyMessageDelayed(SHOW_NET_SPEED, 1000);
                     }
                     break;
                 case PROGRESS:
@@ -304,13 +275,10 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                     int currentPosition = (int) vv.getCurrentPosition();
                     //让SeekBar进度更新
                     seekbarVideo.setProgress(currentPosition);
-
                     //设置文本当前的播放进度
                     tvCurrentTime.setText(utils.stringForTime(currentPosition));
-
                     //得到系统时间
                     tvSystemTime.setText(getSystemTime());
-
                     //设置视频缓存效果
                     if (isNetUri) {
                         int bufferPercentage = vv.getBufferPercentage();//0~100;
@@ -321,21 +289,21 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                         seekbarVideo.setSecondaryProgress(0);
                     }
 
-                    if(isNetUri && vv.isPlaying()){
+                    if (isNetUri && vv.isPlaying()) {
 
                         int duration = currentPosition - preCurrentPosition;
-                        if(duration <500){
+                        if (duration < 500) {
                             //卡
                             ll_buffering.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             //不卡
                             ll_buffering.setVisibility(View.GONE);
                         }
 
                         preCurrentPosition = currentPosition;
                     }
-
                     //循环发消息
+                    handler.removeMessages(PROGRESS);
                     sendEmptyMessageDelayed(PROGRESS, 1000);
 
                     break;
@@ -346,17 +314,10 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         }
     };
 
-    /**
-     * 得到系统时间
-     *
-     * @return
-     */
     private String getSystemTime() {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         return format.format(new Date());
     }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -368,10 +329,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         setListener();
         setData();
-
-        //设置控制面板
-//        vv.setMediaController(new MediaController(this));
-
 
     }
 
@@ -405,15 +362,12 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
     private void initData() {
         utils = new Utils();
-
         //注册监听电量变化广播
         receiver = new MyBroadCastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         //监听电量变化
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(receiver, intentFilter);
-
-
         //实例化手势识别器
         detector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -449,8 +403,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 return super.onSingleTapConfirmed(e);
             }
         });
-
-
         //得到屏幕的宽和高
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -461,7 +413,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
         currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
     }
 
     //记录坐标
@@ -470,7 +421,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     private int mVol;
     //滑动的最大区域
     private float touchRang;
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -493,7 +443,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 //要改变的声音 = （在屏幕滑动的距离/ 滑动的总距离）*最大声音;
                 float delta = (distanceY / touchRang) * maxVoice;
 
-
                 if (delta != 0) {
                     //最终声音 = 原来的+ 要改变的声音
                     int mVoice = (int) Math.min(Math.max(mVol + delta, 0), maxVoice);
@@ -501,12 +450,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
                     updateVoiceProgress(mVoice);
                 }
-
-
-                //注意不要重新赋值
-//                dowY = event.getY();
-
-
                 break;
             case MotionEvent.ACTION_UP:
                 handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
@@ -515,14 +458,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         return super.onTouchEvent(event);
     }
 
-    /**
-     * 是否显示控制面板
-     */
     private boolean isShowMediaController = false;
-
-    /**
-     * 隐藏控制面板
-     */
     private void hideMediaController() {
         llBottom.setVisibility(View.INVISIBLE);
         llTop.setVisibility(View.GONE);
@@ -585,7 +521,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
                 //发消息开始更新播放进度
                 handler.sendEmptyMessage(PROGRESS);
-
                 //隐藏加载效果画面
                 ll_loading.setVisibility(View.GONE);
 
@@ -607,7 +542,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-               // Toast.makeText(SystemVideoPlayerActivity.this, "播放出错了哦", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(SystemVideoPlayerActivity.this, "播放出错了哦", Toast.LENGTH_SHORT).show();
                 //一进来播放就会报错-视频格式不支持 --- 跳转到万能播放器
                 startVitamioPlayer();
                 //播放过程中网络中断导致播放异常--重新播放-三次重试
@@ -628,18 +563,11 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         //设置Seekbar状态改变的监听
         seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            /**
-             *
-             * @param seekBar
-             * @param progress
-             * @param fromUser true:用户拖动改变的，false:系统更新改变的
-             */
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     vv.seekTo(progress);
                 }
-
             }
 
             @Override
@@ -654,26 +582,26 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
             }
         });
 
-        //监听拖动声音
-        seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    updateVoiceProgress(progress);
-                }
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
+//        //监听拖动声音
+//        seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                if (fromUser) {
+//                    updateVoiceProgress(progress);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
 //        //设置监听卡
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -698,28 +626,23 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     }
 
     private void startVitamioPlayer() {
-        if(vv != null){
+        if (vv != null) {
             vv.stopPlayback();
         }
         Intent intent = new Intent(this, SystemVideoPlayerActivity.class);
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
             Bundle bunlder = new Bundle();
-            bunlder.putSerializable("videolist",mediaItems);
-            intent.putExtra("position",position);
+            bunlder.putSerializable("videolist", mediaItems);
+            intent.putExtra("position", position);
             //放入Bundler
             intent.putExtras(bunlder);
-        }else if(uri != null){
+        } else if (uri != null) {
             intent.setData(uri);
         }
         startActivity(intent);
         finish();//关闭系统播放器
     }
 
-    /**
-     * 设置滑动改变声音
-     *
-     * @param progress
-     */
     private void updateVoiceProgress(int progress) {
         currentVoice = progress;
         //真正改变声音
@@ -731,7 +654,6 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         } else {
             isMute = false;
         }
-
     }
 
     private void setPreVideo() {
@@ -744,11 +666,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
-
             //设置按钮状态
             setButtonStatus();
-
-
         }
 
     }
@@ -782,23 +701,15 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
                 btnPre.setEnabled(false);
             }
-
             if (position == mediaItems.size() - 1) {
                 btnNext.setBackgroundResource(R.drawable.btn_next_gray);
                 btnNext.setEnabled(false);
             }
-
         } else if (uri != null) {
             //上一个和下一个不可用点击
             setEnable(false);
         }
     }
-
-    /**
-     * 设置按钮是否可以点击
-     *
-     * @param b
-     */
     private void setEnable(boolean b) {
         if (b) {
             //上一个和下一个都可以点击
@@ -827,25 +738,26 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
             unregisterReceiver(receiver);
             receiver = null;
         }
-
         super.onDestroy();
-
-
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+
             currentVoice--;
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+
             currentVoice++;
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+
             return true;
         }
         return super.onKeyDown(keyCode, event);

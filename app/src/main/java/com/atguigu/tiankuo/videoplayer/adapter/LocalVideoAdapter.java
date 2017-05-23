@@ -13,13 +13,6 @@ import com.atguigu.tiankuo.videoplayer.utils.Utils;
 
 import java.util.ArrayList;
 
-/**
- * 作者：杨光福 on 2017/5/19 15:44
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
-
 public class LocalVideoAdapter extends BaseAdapter {
     private final Context context;
     private final ArrayList<MediaItem> datas;

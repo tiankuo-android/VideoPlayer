@@ -11,14 +11,6 @@ import android.widget.Toast;
 
 import com.atguigu.tiankuo.videoplayer.R;
 
-
-/**
- * 作者：杨光福 on 2017/5/19 10:55
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
-
 public class Titlebar extends LinearLayout implements View.OnClickListener {
 
     private final Context context;

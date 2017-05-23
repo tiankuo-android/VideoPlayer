@@ -7,17 +7,8 @@ import android.widget.TextView;
 
 import com.atguigu.tiankuo.videoplayer.fragment.BaseFragment;
 
-/**
- * 作者：杨光福 on 2017/5/19 11:47
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
-
 public class LocalAudioPager extends BaseFragment {
     private TextView textView;
-
-
     //重写视图
     @Override
     public View initView() {
@@ -27,7 +18,6 @@ public class LocalAudioPager extends BaseFragment {
         textView.setTextColor(Color.RED);
         return textView;
     }
-
     @Override
     public void initData() {
         super.initData();
