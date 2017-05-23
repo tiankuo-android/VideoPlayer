@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 public class MediaItem implements Serializable{
 
+    private String videoTitle;
+
     public MediaItem(String name, long duration, long size, String data) {
         this.name = name;
         this.duration = duration;
@@ -16,6 +18,10 @@ public class MediaItem implements Serializable{
     private long duration;
     private long size;
     private String data;
+
+    public MediaItem() {
+
+    }
 
     public String getName() {
         return name;
@@ -57,5 +63,10 @@ public class MediaItem implements Serializable{
                 ", size=" + size +
                 ", data='" + data + '\'' +
                 '}';
+    }
+
+
+    public void setVideoTitle(String videoTitle) {
+        this.videoTitle = videoTitle;
     }
 }

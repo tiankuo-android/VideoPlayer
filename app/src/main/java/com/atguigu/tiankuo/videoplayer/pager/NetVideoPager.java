@@ -1,7 +1,7 @@
 package com.atguigu.tiankuo.videoplayer.pager;
 
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.atguigu.tiankuo.videoplayer.R;
 import com.atguigu.tiankuo.videoplayer.activity.SystemVideoPlayerActivity;
 import com.atguigu.tiankuo.videoplayer.adapter.NetVideoAdapter;
+import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 import com.atguigu.tiankuo.videoplayer.domain.MoveInfo;
 import com.atguigu.tiankuo.videoplayer.fragment.BaseFragment;
 import com.google.gson.Gson;
@@ -19,6 +20,7 @@ import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,6 +29,10 @@ public class NetVideoPager extends BaseFragment {
 
     private ListView lv;
     private TextView tv_nodata;
+    private ArrayList<MediaItem> mediaitems;
+    private MediaItem mediaItem;
+    private  List<MoveInfo.TrailersBean> datas;
+
     @Override
     public View initView() {
         Log.e("TAG","NetVideoPager-initView");
@@ -39,8 +45,19 @@ public class NetVideoPager extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MoveInfo.TrailersBean item = adapter.getItem(position);
 
+                for(int i = 0; i < datas.size(); i++) {
+                    MoveInfo.TrailersBean trailersBean = datas.get(i);
+                    mediaItem = new MediaItem();
+                    mediaItem.setVideoTitle(trailersBean.getVideoTitle());
+                    mediaItem.setData(trailersBean.getUrl());
+                    mediaitems.add(mediaItem);
+                }
                 Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
-                intent.setDataAndType(Uri.parse(item.getUrl()),"video/*");
+                Bundle bunlder = new Bundle();
+                bunlder.putSerializable("videolist",mediaitems);
+                intent.putExtra("position",position);
+                //放入Bundler
+                intent.putExtras(bunlder);
                 startActivity(intent);
 
             }
@@ -86,7 +103,8 @@ public class NetVideoPager extends BaseFragment {
 
     private void processData(String json) {
         MoveInfo moveInfo = new Gson().fromJson(json, MoveInfo.class);
-        List<MoveInfo.TrailersBean> datas = moveInfo.getTrailers();
+        datas = moveInfo.getTrailers();
+        mediaitems = new ArrayList<MediaItem>();
         if(datas != null && datas.size() >0){
             tv_nodata.setVisibility(View.GONE);
             adapter = new NetVideoAdapter(context,datas);
