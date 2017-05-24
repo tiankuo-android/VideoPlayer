@@ -4,16 +4,19 @@ import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.atguigu.tiankuo.videoplayer.IMusicPlayService;
 import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +27,7 @@ public class MusicPlayService extends Service {
 
     private IMusicPlayService.Stub stub = new IMusicPlayService.Stub() {
         MusicPlayService service = MusicPlayService.this;
+
         @Override
         public void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, String aString) throws RemoteException {
 
@@ -83,9 +87,18 @@ public class MusicPlayService extends Service {
         public void pre() throws RemoteException {
             service.pre();
         }
+
+        @Override
+        public boolean isPlaying() throws RemoteException {
+            return mediaPlayer.isPlaying();
+        }
+
     };
 
     private ArrayList<MediaItem> mediaItems;
+    private MediaPlayer mediaPlayer;
+    private int position;
+    private MediaItem mediaItem;
 
     @Override
     public void onCreate() {
@@ -94,8 +107,8 @@ public class MusicPlayService extends Service {
     }
 
     private void getData() {
-        new Thread(){
-            public void run(){
+        new Thread() {
+            public void run() {
                 mediaItems = new ArrayList<MediaItem>();
                 ContentResolver resolver = getContentResolver();
                 Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -107,15 +120,15 @@ public class MusicPlayService extends Service {
                         MediaStore.Audio.Media.ARTIST//艺术家
                 };
                 Cursor cursor = resolver.query(uri, objs, null, null, null);
-                if(cursor != null ){
-                    while (cursor.moveToNext()){
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
                         String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                         long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                         String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                        Log.e("TAG","name=="+name+",duration=="+duration+",data==="+data);
+                        Log.e("TAG", "name==" + name + ",duration==" + duration + ",data===" + data);
 
-                        mediaItems.add(new MediaItem(name,duration,size,data));
+                        mediaItems.add(new MediaItem(name, duration, size, data));
                     }
                     cursor.close();
                 }
@@ -129,49 +142,107 @@ public class MusicPlayService extends Service {
         return stub;
 
     }
+
     //根据位置播放音频
-    private void openAudio(int position){
+    private void openAudio(int position) {
+        this.position = position;
+        if (mediaItems != null && mediaItems.size() > 0) {
+            if (position < mediaItems.size()) {
+                mediaItem = mediaItems.get(position);
 
+                if (mediaPlayer != null) {
+                    mediaPlayer.reset();
+                    mediaPlayer = null;
+                }
+                try {
+                    mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setDataSource(mediaItem.getData());
+
+                    mediaPlayer.setOnPreparedListener(new MyOnPreparedListener());
+                    mediaPlayer.setOnErrorListener(new MyOnErrorListener());
+                    mediaPlayer.setOnCompletionListener(new MyOnCompletionListener());
+                    //准备
+                    mediaPlayer.prepareAsync();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            Toast.makeText(MusicPlayService.this, "音频还没有加载完成", Toast.LENGTH_SHORT).show();
+        }
     }
+    class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
+        @Override
+        public void onPrepared(MediaPlayer mp) {
+            start();
+        }
+    }
+
+    class MyOnErrorListener implements MediaPlayer.OnErrorListener{
+
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+            next();
+            return true;
+        }
+    }
+
+    class MyOnCompletionListener implements MediaPlayer.OnCompletionListener{
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            next();
+        }
+    }
+
     //开始播放音频
-    private void start(){
-
+    private void start() {
+        mediaPlayer.start();
     }
+
     //暂停播放音频
-    private void pause(){
-
+    private void pause() {
+        mediaPlayer.pause();
     }
+
     //得到演唱者的名字
-    private String getArtisName(){
+    private String getArtisName() {
         return "";
     }
+
     //得到歌曲名
-    private String getAudioName(){
+    private String getAudioName() {
         return "";
     }
+
     //得到歌曲路径
-    private String getAudioPath(){
+    private String getAudioPath() {
         return "";
     }
+
     //得到总时长
-    private int getDuration(){
+    private int getDuration() {
         return 0;
     }
+
     //得到当前播放进度
-    private int getCurrentPosition(){
+    private int getCurrentPosition() {
         return 0;
     }
+
     //音频拖动
-    private void seekTo(int position){
+    private void seekTo(int position) {
 
     }
+
     //播放下一个
-    private void next(){
+    private void next() {
 
     }
+
     //播放上一个
-    private void pre(){
+    private void pre() {
 
     }
-
 }
