@@ -119,6 +119,8 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         btnStartPause.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnLyric.setOnClickListener(this);
+
+        seekbarAudio.setOnSeekBarChangeListener(new MyOnSeekBarChangeListener());
     }
 
 
@@ -214,4 +216,27 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     }
 
 
+    private class MyOnSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if(fromUser) {
+                try {
+                    service.seekTo(progress);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    }
 }
