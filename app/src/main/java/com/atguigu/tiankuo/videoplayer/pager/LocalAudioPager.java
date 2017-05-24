@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.atguigu.tiankuo.videoplayer.R;
-import com.atguigu.tiankuo.videoplayer.activity.SystemVideoPlayerActivity;
+import com.atguigu.tiankuo.videoplayer.activity.AudioPlayerActivity;
 import com.atguigu.tiankuo.videoplayer.adapter.LocalVideoAdapter;
 import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 import com.atguigu.tiankuo.videoplayer.fragment.BaseFragment;
@@ -39,7 +39,7 @@ public class LocalAudioPager extends BaseFragment {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
+                Intent intent = new Intent(context, AudioPlayerActivity.class);
 
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("videolist",mediaItems);
@@ -70,7 +70,7 @@ public class LocalAudioPager extends BaseFragment {
                 //有数据
                 tv_nodata.setVisibility(View.GONE);
                 //设置适配器
-                adapter = new LocalVideoAdapter(context,mediaItems,true);
+                adapter = new LocalVideoAdapter(context,mediaItems,false);
                 lv.setAdapter(adapter);
             }else{
                 //没有数据

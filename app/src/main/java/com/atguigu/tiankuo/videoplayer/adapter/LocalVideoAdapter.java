@@ -66,8 +66,6 @@ public class LocalVideoAdapter extends BaseAdapter {
         if(!isVideo) {
             viewHolder.iv_icon.setImageResource(R.drawable.music_default_bg);
         }
-
-
         return convertView;
     }
 
