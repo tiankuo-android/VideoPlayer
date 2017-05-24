@@ -43,7 +43,7 @@ public class LocalAudioPager extends BaseFragment {
 //                Bundle bundle = new Bundle();
 //                bundle.putSerializable("videolist",mediaItems);
                 intent.putExtra("position",position);
-//                intent.putExtras(bundle);
+//                intent.putExtras(b    undle);
                 startActivity(intent);
             }
         });
@@ -88,7 +88,8 @@ public class LocalAudioPager extends BaseFragment {
                         MediaStore.Audio.Media.DISPLAY_NAME,//音频在sdcard上的名称
                         MediaStore.Audio.Media.DURATION,//音频时长
                         MediaStore.Audio.Media.SIZE,//音频文件的大小
-                        MediaStore.Audio.Media.DATA//音频播放地址
+                        MediaStore.Audio.Media.DATA,//音频播放地址
+                        MediaStore.Audio.Media.ARTIST//艺术家名称
                 };
                 Cursor cursor = resolver.query(uri, objs, null, null, null);
                 if(cursor != null ){
@@ -97,9 +98,11 @@ public class LocalAudioPager extends BaseFragment {
                         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                         long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                         String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                        String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+
                         Log.e("TAG","name=="+name+",duration=="+duration+",data==="+data);
 
-                        mediaItems.add(new MediaItem(name,duration,size,data));
+                        mediaItems.add(new MediaItem(name,duration,size,data,artist));
                     }
                     cursor.close();
                 }

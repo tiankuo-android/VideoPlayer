@@ -49,8 +49,8 @@ public class MusicPlayService extends Service {
         }
 
         @Override
-        public String getArtisName() throws RemoteException {
-            return service.getArtisName();
+        public String getArtistName() throws RemoteException {
+            return service.getArtistName();
         }
 
         @Override
@@ -99,6 +99,7 @@ public class MusicPlayService extends Service {
     private MediaPlayer mediaPlayer;
     private int position;
     private MediaItem mediaItem;
+    public static final String OPEN_COMPLETE = "com.atguigu.mobileplayer.OPEN_COMPLETE";
 
     @Override
     public void onCreate() {
@@ -175,8 +176,15 @@ public class MusicPlayService extends Service {
     class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
         @Override
         public void onPrepared(MediaPlayer mp) {
+            notifyChange(OPEN_COMPLETE);
             start();
         }
+    }
+
+    private void notifyChange(String action) {
+        Intent intent = new Intent(action);
+        sendBroadcast(intent);
+
     }
 
     class MyOnErrorListener implements MediaPlayer.OnErrorListener{
@@ -207,13 +215,13 @@ public class MusicPlayService extends Service {
     }
 
     //得到演唱者的名字
-    private String getArtisName() {
-        return "";
+    private String getArtistName() {
+        return  mediaItem.getArtist();
     }
 
     //得到歌曲名
     private String getAudioName() {
-        return "";
+        return mediaItem.getName();
     }
 
     //得到歌曲路径
@@ -223,12 +231,12 @@ public class MusicPlayService extends Service {
 
     //得到总时长
     private int getDuration() {
-        return 0;
+        return mediaPlayer.getDuration();
     }
 
     //得到当前播放进度
     private int getCurrentPosition() {
-        return 0;
+        return mediaPlayer.getCurrentPosition();
     }
 
     //音频拖动

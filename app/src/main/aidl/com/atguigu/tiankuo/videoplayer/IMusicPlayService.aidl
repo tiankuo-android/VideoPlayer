@@ -21,7 +21,7 @@ interface IMusicPlayService {
                 void pause();
 
                 //得到演唱者的名字
-                String getArtisName();
+                String getArtistName();
 
                 //得到歌曲名
                 String getAudioName();

@@ -19,24 +19,30 @@
             android:layout_centerHorizontal="true"
             android:src="@drawable/now_playing_matrix_01" />
 
-
-        <TextView
-            android:id="@+id/tv_artist"
+        <LinearLayout
+            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:textColor="#ffffff" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tv_audioname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="70dp"
-            android:textColor="#ffffff"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/tv_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="50dp"
+                android:text="tiankuo"
+                android:textColor="#ffffff" />
 
+            <TextView
+                android:id="@+id/tv_audioname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="70dp"
+                android:textColor="#ffffff"
+                android:text="123456"
+                android:textSize="18sp" />
+        </LinearLayout>
     </RelativeLayout>
 
 

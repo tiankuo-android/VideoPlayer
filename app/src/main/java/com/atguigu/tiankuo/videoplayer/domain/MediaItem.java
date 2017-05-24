@@ -5,28 +5,12 @@ import java.io.Serializable;
 
 public class MediaItem implements Serializable{
 
-    private String videoTitle;
-
-    public MediaItem(String name, long duration, long size, String data) {
-        this.name = name;
-        this.duration = duration;
-        this.size = size;
-        this.data = data;
-    }
-
-    public MediaItem(String name, long duration, long size, String data, String artist) {
-        this.name = name;
-        this.duration = duration;
-        this.size = size;
-        this.data = data;
-        this.artist = artist;
-    }
-
     private String name;
     private long duration;
     private long size;
     private String data;
     private String artist;
+    private String videoTitle;
 
     public String getArtist() {
         return artist;
@@ -34,10 +18,6 @@ public class MediaItem implements Serializable{
 
     public void setArtist(String artist) {
         this.artist = artist;
-    }
-
-    public MediaItem() {
-
     }
 
     public String getName() {
@@ -72,6 +52,24 @@ public class MediaItem implements Serializable{
         this.data = data;
     }
 
+    public MediaItem() {
+    }
+
+    public MediaItem(String name, long duration, long size, String data) {
+        this.name = name;
+        this.duration = duration;
+        this.size = size;
+        this.data = data;
+    }
+
+    public MediaItem(String name, long duration, long size, String data,String artist) {
+        this.name = name;
+        this.duration = duration;
+        this.size = size;
+        this.data = data;
+        this.artist = artist;
+    }
+
     @Override
     public String toString() {
         return "MediaItem{" +
@@ -81,7 +79,6 @@ public class MediaItem implements Serializable{
                 ", data='" + data + '\'' +
                 '}';
     }
-
 
     public void setVideoTitle(String videoTitle) {
         this.videoTitle = videoTitle;
