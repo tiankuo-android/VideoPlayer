@@ -10,9 +10,9 @@ import android.widget.TextView;
 import com.atguigu.tiankuo.videoplayer.R;
 import com.atguigu.tiankuo.videoplayer.domain.MoveInfo;
 import com.atguigu.tiankuo.videoplayer.utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import org.xutils.image.ImageOptions;
-import org.xutils.x;
 
 import java.util.List;
 
@@ -59,30 +59,33 @@ public class NetVideoAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if(convertView == null){
-            convertView = View.inflate(context, R.layout.item_net_video,null);
+        if (convertView == null) {
+            convertView = View.inflate(context, R.layout.item_net_video, null);
             viewHolder = new ViewHolder();
             viewHolder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
             viewHolder.iv_icon = (ImageView) convertView.findViewById(R.id.iv_icon);
             viewHolder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
             viewHolder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
             convertView.setTag(viewHolder);
-        }else {
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         //根据位置得到对应的数据
         MoveInfo.TrailersBean trailersBean = datas.get(position);
         viewHolder.tv_name.setText(trailersBean.getMovieName());
-        viewHolder.tv_size.setText(trailersBean.getVideoLength()+"秒");
+        viewHolder.tv_size.setText(trailersBean.getVideoLength() + "秒");
         viewHolder.tv_duration.setText(trailersBean.getVideoTitle());
-        x.image().bind(viewHolder.iv_icon, trailersBean.getCoverImg(),imageOptions);
-
-
+//        x.image().bind(viewHolder.iv_icon, trailersBean.getCoverImg(),imageOptions);
+        Picasso.with(context)
+                .load(trailersBean.getCoverImg())
+                .placeholder(R.drawable.video_default)
+                .error(R.drawable.video_default)
+                .into(viewHolder.iv_icon);
         return convertView;
     }
 
-    static class ViewHolder{
+    static class ViewHolder {
         ImageView iv_icon;
         TextView tv_name;
         TextView tv_duration;

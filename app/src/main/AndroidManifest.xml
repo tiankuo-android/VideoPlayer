@@ -28,7 +28,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:configChanges="orientation|keyboardHidden|screenSize|touchscreen"
             android:launchMode="singleTask" />
         <activity android:name=".activity.SystemVideoPlayerActivity"
             android:screenOrientation="landscape"
@@ -64,6 +64,7 @@
 
         </activity>
         <activity android:name=".activity.VitamioVideoPlayerActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|touchscreen"
             android:screenOrientation="landscape"
             android:launchMode="singleTask"
             android:theme="@style/noAnimation_Theme"

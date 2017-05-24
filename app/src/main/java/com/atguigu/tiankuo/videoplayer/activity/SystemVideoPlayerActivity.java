@@ -89,7 +89,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnStartPause;
     private Button btnNext;
     private Button btnSwitchScreen;
-    private int videoType;
 
     private void findViews() {
         setContentView(R.layout.activity_system_video_player);
