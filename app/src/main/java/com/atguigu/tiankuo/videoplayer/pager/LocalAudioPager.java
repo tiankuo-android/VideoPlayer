@@ -70,7 +70,7 @@ public class LocalAudioPager extends BaseFragment {
                 //有数据
                 tv_nodata.setVisibility(View.GONE);
                 //设置适配器
-                adapter = new LocalVideoAdapter(context,mediaItems);
+                adapter = new LocalVideoAdapter(context,mediaItems,true);
                 lv.setAdapter(adapter);
             }else{
                 //没有数据
