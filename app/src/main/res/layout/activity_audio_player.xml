@@ -4,6 +4,7 @@
     android:id="@+id/activity_audio_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/base_bg"
     tools:context="com.atguigu.tiankuo.videoplayer.activity.AudioPlayerActivity">
 
     <RelativeLayout
