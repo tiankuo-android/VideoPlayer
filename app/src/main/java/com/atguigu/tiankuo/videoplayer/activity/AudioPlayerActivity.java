@@ -47,6 +47,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     private int position;
     private MyReceiver receiver;
     private Utils utils;
+    private boolean notification;
 
     private final static int PROGRESS = 0;
 
@@ -80,7 +81,11 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             service = IMusicPlayService.Stub.asInterface(iBinder);
             if (service != null) {
                 try {
-                    service.openAudio(position);
+                    if(notification) {
+                        setViewData();
+                    }else {
+                        service.openAudio(position);
+                    }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -92,6 +97,19 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
         }
     };
+
+    private void setViewData() {
+            try {
+                tvArtist.setText(service.getArtistName());
+                tvAudioname.setText(service.getAudioName());
+                int duration = service.getDuration();
+                seekbarAudio.setMax(duration);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            handler.sendEmptyMessage(PROGRESS);
+    }
+
     private Object data;
 
     private void findViews() {
@@ -148,23 +166,16 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             setViewData();
         }
 
-        private void setViewData() {
-            try {
-                tvArtist.setText(service.getArtistName());
-                tvAudioname.setText(service.getAudioName());
-                int duration = service.getDuration();
-                seekbarAudio.setMax(duration);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-            handler.sendEmptyMessage(PROGRESS);
-        }
+
 
 
     }
 
         private void getData() {
-            position = getIntent().getIntExtra("position", 0);
+            notification = getIntent().getBooleanExtra("notification", false);
+            if(!notification) {
+                position = getIntent().getIntExtra("position", 0);
+            }
         }
 
 

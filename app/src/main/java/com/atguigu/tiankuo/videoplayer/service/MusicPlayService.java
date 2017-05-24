@@ -1,19 +1,26 @@
 package com.atguigu.tiankuo.videoplayer.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.atguigu.tiankuo.videoplayer.IMusicPlayService;
+import com.atguigu.tiankuo.videoplayer.R;
+import com.atguigu.tiankuo.videoplayer.activity.AudioPlayerActivity;
 import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 
 import java.io.IOException;
@@ -100,6 +107,7 @@ public class MusicPlayService extends Service {
     private int position;
     private MediaItem mediaItem;
     public static final String OPEN_COMPLETE = "com.atguigu.mobileplayer.OPEN_COMPLETE";
+    private NotificationManager nm;
 
     @Override
     public void onCreate() {
@@ -169,10 +177,11 @@ public class MusicPlayService extends Service {
                     e.printStackTrace();
                 }
             }
-        }else{
+        } else {
             Toast.makeText(MusicPlayService.this, "音频还没有加载完成", Toast.LENGTH_SHORT).show();
         }
     }
+
     class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
         @Override
         public void onPrepared(MediaPlayer mp) {
@@ -187,7 +196,7 @@ public class MusicPlayService extends Service {
 
     }
 
-    class MyOnErrorListener implements MediaPlayer.OnErrorListener{
+    class MyOnErrorListener implements MediaPlayer.OnErrorListener {
 
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -196,7 +205,7 @@ public class MusicPlayService extends Service {
         }
     }
 
-    class MyOnCompletionListener implements MediaPlayer.OnCompletionListener{
+    class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
 
         @Override
         public void onCompletion(MediaPlayer mp) {
@@ -204,19 +213,32 @@ public class MusicPlayService extends Service {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     //开始播放音频
     private void start() {
         mediaPlayer.start();
+        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, AudioPlayerActivity.class);
+        intent.putExtra("notification", true);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification notifation = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.notification_music_playing)
+                .setContentTitle("321音乐")
+                .setContentText("正在播放：" + getAudioName())
+                .setContentIntent(pi)
+                .build();
+        nm.notify(1, notifation);
     }
 
     //暂停播放音频
     private void pause() {
         mediaPlayer.pause();
+        nm.cancel(1);
     }
 
     //得到演唱者的名字
     private String getArtistName() {
-        return  mediaItem.getArtist();
+        return mediaItem.getArtist();
     }
 
     //得到歌曲名
