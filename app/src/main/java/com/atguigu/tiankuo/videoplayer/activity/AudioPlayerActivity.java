@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -100,8 +101,11 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
     private void setViewData() {
         try {
+            setButtonImage();
             tvArtist.setText(service.getArtistName());
+            Log.e("TAG","service.getArtistName()--"+service.getArtistName());
             tvAudioname.setText(service.getAudioName());
+            Log.e("TAG","service.getAudioName()--"+service.getAudioName());
             int duration = service.getDuration();
             seekbarAudio.setMax(duration);
         } catch (RemoteException e) {
@@ -180,9 +184,13 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         if (v == btnPlaymode) {
-
+            setPlaymode();
         } else if (v == btnPre) {
-
+            try {
+                service.pre();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         } else if (v == btnStartPause) {
             try {
                 if (service.isPlaying()) {
@@ -198,7 +206,11 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             }
 
         } else if (v == btnNext) {
-
+            try {
+                service.next();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         } else if (v == btnLyric) {
 
         }
