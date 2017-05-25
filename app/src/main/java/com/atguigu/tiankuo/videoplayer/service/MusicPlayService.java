@@ -45,6 +45,7 @@ public class MusicPlayService extends Service {
             service.openAudio(position);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void start() throws RemoteException {
             service.start();
@@ -100,6 +101,17 @@ public class MusicPlayService extends Service {
             return mediaPlayer.isPlaying();
         }
 
+        @Override
+        public int getPlaymode() throws RemoteException{
+            return service.getPlaymode();
+        }
+
+
+        @Override
+        public void setPlaymode(int playmode) throws RemoteException {
+            service.setPlaymode(playmode);
+        }
+
     };
 
     private ArrayList<MediaItem> mediaItems;
@@ -108,6 +120,17 @@ public class MusicPlayService extends Service {
     private MediaItem mediaItem;
     public static final String OPEN_COMPLETE = "com.atguigu.mobileplayer.OPEN_COMPLETE";
     private NotificationManager nm;
+
+    //顺序播放
+    public static final int REPEAT_NORMAL = 1;
+    //单曲播放
+    public static final int REPEAT_SINGLE = 2;
+    //全部循环播放
+    public static final int REPEAT_ALL = 3;
+    //播放模式
+    private int playmode = REPEAT_NORMAL;
+
+
 
     @Override
     public void onCreate() {
@@ -183,6 +206,7 @@ public class MusicPlayService extends Service {
     }
 
     class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void onPrepared(MediaPlayer mp) {
             notifyChange(OPEN_COMPLETE);
@@ -213,8 +237,9 @@ public class MusicPlayService extends Service {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+//    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     //开始播放音频
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void start() {
         mediaPlayer.start();
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -274,5 +299,15 @@ public class MusicPlayService extends Service {
     //播放上一个
     private void pre() {
 
+    }
+
+    //得到播放模式
+    public int getPlaymode(){
+        return playmode;
+    }
+
+    //设置播放模式
+    public void setPlaymode(int playmode){
+        this.playmode = playmode;
     }
 }

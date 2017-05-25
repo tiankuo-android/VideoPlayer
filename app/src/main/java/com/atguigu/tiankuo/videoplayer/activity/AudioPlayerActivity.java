@@ -81,9 +81,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             service = IMusicPlayService.Stub.asInterface(iBinder);
             if (service != null) {
                 try {
-                    if(notification) {
+                    if (notification) {
                         setViewData();
-                    }else {
+                    } else {
                         service.openAudio(position);
                     }
                 } catch (RemoteException e) {
@@ -99,15 +99,15 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     };
 
     private void setViewData() {
-            try {
-                tvArtist.setText(service.getArtistName());
-                tvAudioname.setText(service.getAudioName());
-                int duration = service.getDuration();
-                seekbarAudio.setMax(duration);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-            handler.sendEmptyMessage(PROGRESS);
+        try {
+            tvArtist.setText(service.getArtistName());
+            tvAudioname.setText(service.getAudioName());
+            int duration = service.getDuration();
+            seekbarAudio.setMax(duration);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        handler.sendEmptyMessage(PROGRESS);
     }
 
     private Object data;
@@ -167,16 +167,14 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         }
 
 
-
-
     }
 
-        private void getData() {
-            notification = getIntent().getBooleanExtra("notification", false);
-            if(!notification) {
-                position = getIntent().getIntExtra("position", 0);
-            }
+    private void getData() {
+        notification = getIntent().getBooleanExtra("notification", false);
+        if (!notification) {
+            position = getIntent().getIntExtra("position", 0);
         }
+    }
 
 
     @Override
@@ -206,6 +204,41 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    private void setPlaymode() {
+        try {
+            int playmode = service.getPlaymode();
+            if (playmode == MusicPlayService.REPEAT_NORMAL) {
+                playmode = MusicPlayService.REPEAT_SINGLE;
+            } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
+                playmode = MusicPlayService.REPEAT_ALL;
+            } else if (playmode == MusicPlayService.REPEAT_ALL) {
+                playmode = MusicPlayService.REPEAT_NORMAL;
+            }
+            //保存到服务里面
+            service.setPlaymode(playmode);
+
+            setButtonImage();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void setButtonImage() {
+        try {
+            int playmode = service.getPlaymode();
+            if (playmode == MusicPlayService.REPEAT_NORMAL) {
+                btnPlaymode.setBackgroundResource(R.drawable.btn_playmode_normal_selector);
+            } else if (playmode == MusicPlayService.REPEAT_ALL) {
+                btnPlaymode.setBackgroundResource(R.drawable.btn_playmode_all_selector);
+            } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
+                btnPlaymode.setBackgroundResource(R.drawable.btn_playmode_single_selector);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void startAndBindService() {
         Intent intent = new Intent(this, MusicPlayService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -219,7 +252,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             connection = null;
         }
 
-        if(receiver != null) {
+        if (receiver != null) {
             unregisterReceiver(receiver);
             receiver = null;
         }
@@ -230,7 +263,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     private class MyOnSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if(fromUser) {
+            if (fromUser) {
                 try {
                     service.seekTo(progress);
                 } catch (RemoteException e) {

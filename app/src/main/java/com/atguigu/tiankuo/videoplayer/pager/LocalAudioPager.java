@@ -43,6 +43,7 @@ public class LocalAudioPager extends BaseFragment {
 //                Bundle bundle = new Bundle();
 //                bundle.putSerializable("videolist",mediaItems);
                 intent.putExtra("position",position);
+                intent.putExtra("notification",false);
 //                intent.putExtras(b    undle);
                 startActivity(intent);
             }
