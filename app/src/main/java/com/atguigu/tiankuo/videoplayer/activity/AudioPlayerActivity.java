@@ -24,8 +24,13 @@ import android.widget.TextView;
 
 import com.atguigu.tiankuo.videoplayer.IMusicPlayService;
 import com.atguigu.tiankuo.videoplayer.R;
+import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 import com.atguigu.tiankuo.videoplayer.service.MusicPlayService;
 import com.atguigu.tiankuo.videoplayer.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import static com.atguigu.tiankuo.videoplayer.R.id.iv_icon;
 
@@ -83,7 +88,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             if (service != null) {
                 try {
                     if (notification) {
-                        setViewData();
+                        setViewData(null);
                     } else {
                         service.openAudio(position);
                     }
@@ -98,8 +103,8 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
         }
     };
-
-    private void setViewData() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void setViewData(MediaItem mediaItem) {
         try {
             setButtonImage();
             tvArtist.setText(service.getArtistName());
@@ -162,12 +167,13 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         intentFilter.addAction(MusicPlayService.OPEN_COMPLETE);
         registerReceiver(receiver, intentFilter);
         utils = new Utils();
+        EventBus.getDefault().register(this);
     }
 
     class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            setViewData();
+            setViewData(null);
         }
 
 
@@ -269,6 +275,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             receiver = null;
         }
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
 

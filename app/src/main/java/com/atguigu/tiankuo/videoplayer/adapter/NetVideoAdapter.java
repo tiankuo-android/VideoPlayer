@@ -16,12 +16,6 @@ import org.xutils.image.ImageOptions;
 
 import java.util.List;
 
-/**
- * 作者：杨光福 on 2017/5/19 15:44
- * QQ：541433511
- * 微信：yangguangfu520
- * 作用：
- */
 
 public class NetVideoAdapter extends BaseAdapter {
     private final Context context;

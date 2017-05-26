@@ -22,6 +22,8 @@ import com.atguigu.tiankuo.videoplayer.R;
 import com.atguigu.tiankuo.videoplayer.activity.AudioPlayerActivity;
 import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -217,7 +219,8 @@ public class MusicPlayService extends Service {
     class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
         @Override
         public void onPrepared(MediaPlayer mp) {
-            notifyChange(OPEN_COMPLETE);
+//            notifyChange(OPEN_COMPLETE);
+            EventBus.getDefault().post(mediaItem);
             start();
         }
     }
