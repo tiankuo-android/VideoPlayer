@@ -24,13 +24,19 @@ import android.widget.TextView;
 
 import com.atguigu.tiankuo.videoplayer.IMusicPlayService;
 import com.atguigu.tiankuo.videoplayer.R;
+import com.atguigu.tiankuo.videoplayer.domain.Lyric;
 import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 import com.atguigu.tiankuo.videoplayer.service.MusicPlayService;
+import com.atguigu.tiankuo.videoplayer.utils.LyricsUtils;
 import com.atguigu.tiankuo.videoplayer.utils.Utils;
+import com.atguigu.tiankuo.videoplayer.view.LyricShowView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.File;
+import java.util.ArrayList;
 
 import static com.atguigu.tiankuo.videoplayer.R.id.iv_icon;
 
@@ -54,14 +60,29 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     private MyReceiver receiver;
     private Utils utils;
     private boolean notification;
+    private LyricShowView lyric_show_view;
 
     private final static int PROGRESS = 0;
+    private static final int SHOW_LYRIC = 1;
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case SHOW_LYRIC:
+                    try {
+                        int currentPosition = service.getCurrentPosition();
+
+                        //调用歌词显示控件的setNextShowLyric
+                        lyric_show_view.setNextShowLyric(currentPosition);
+
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    removeMessages(SHOW_LYRIC);
+                    sendEmptyMessage(SHOW_LYRIC);
+                    break;
                 case PROGRESS:
                     try {
                         int current = service.getCurrentPosition();
@@ -103,20 +124,43 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
         }
     };
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void setViewData(MediaItem mediaItem) {
         try {
             setButtonImage();
             tvArtist.setText(service.getArtistName());
-            Log.e("TAG","service.getArtistName()--"+service.getArtistName());
+            Log.e("TAG", "service.getArtistName()--" + service.getArtistName());
             tvAudioname.setText(service.getAudioName());
-            Log.e("TAG","service.getAudioName()--"+service.getAudioName());
+            Log.e("TAG", "service.getAudioName()--" + service.getAudioName());
             int duration = service.getDuration();
             seekbarAudio.setMax(duration);
+            //解析歌词
+            //1.得到歌词所在路径
+            String audioPath = service.getAudioPath();//mnt/sdcard/audio/beijingbeijing.mp3
+
+            String lyricPath = audioPath.substring(0, audioPath.lastIndexOf("."));//mnt/sdcard/audio/beijingbeijing
+            File file = new File(lyricPath + ".lrc");
+            if (!file.exists()) {
+                file = new File(lyricPath + ".txt");
+            }
+            LyricsUtils lyricsUtils = new LyricsUtils();
+            lyricsUtils.readFile(file);
+
+            //2.传入解析歌词的工具类
+            ArrayList<Lyric> lyrics = lyricsUtils.getLyrics();
+            lyric_show_view.setLyrics(lyrics);
+
+            //3.如果有歌词，就歌词同步
+
+            if (lyricsUtils.isLyric()) {
+                handler.sendEmptyMessage(SHOW_LYRIC);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         handler.sendEmptyMessage(PROGRESS);
+//        handler.sendEmptyMessage(SHOW_LYRIC);
     }
 
     private Object data;
@@ -140,6 +184,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         btnStartPause = (Button) findViewById(R.id.btn_start_pause);
         btnNext = (Button) findViewById(R.id.btn_next);
         btnLyric = (Button) findViewById(R.id.btn_lyric);
+        lyric_show_view = (LyricShowView) findViewById(R.id.lyric_show_view);
 
         btnPlaymode.setOnClickListener(this);
         btnPre.setOnClickListener(this);
@@ -274,8 +319,12 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             unregisterReceiver(receiver);
             receiver = null;
         }
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+
     }
 
 

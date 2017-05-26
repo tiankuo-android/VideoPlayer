@@ -285,7 +285,7 @@ public class MusicPlayService extends Service {
 
     //得到歌曲路径
     private String getAudioPath() {
-        return "";
+        return mediaItem.getData();
     }
 
     //得到总时长

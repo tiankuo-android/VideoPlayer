@@ -23,7 +23,8 @@ public class LyricShowView extends TextView {
     private ArrayList<Lyric> lyrics;
 
     private int index = 0;
-    private float textHeight = 20;
+    private float textHeight = 70;
+    private int currentPosition;
 
     public LyricShowView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,7 +45,7 @@ public class LyricShowView extends TextView {
         //设置颜色
         paintGreen.setColor(Color.GREEN);
         //设置文字大小
-        paintGreen.setTextSize(16);
+        paintGreen.setTextSize(55);
         //设置对齐
         paintGreen.setTextAlign(Paint.Align.CENTER);
 
@@ -54,22 +55,22 @@ public class LyricShowView extends TextView {
         //设置颜色
         paintWhite.setColor(Color.WHITE);
         //设置文字大小
-        paintWhite.setTextSize(16);
+        paintWhite.setTextSize(55);
         //设置对齐
         paintWhite.setTextAlign(Paint.Align.CENTER);
 
         lyrics = new ArrayList<Lyric>();
         Lyric lyric = new Lyric();
 
-        for (int i = 0; i < 1000; i++) {
-            lyric.setContent("aaaaaaaaaaaa_" + i);
-            lyric.setSleepTime(2000);
-            lyric.setTimePoint(2000 * i);
-            //添加到集合
-            lyrics.add(lyric);
-            //重新创建新对象
-            lyric = new Lyric();
-        }
+//        for (int i = 0; i < 1000; i++) {
+//            lyric.setContent("aaaaaaaa_" + i);
+//            lyric.setSleepTime(2000);
+//            lyric.setTimePoint(2000 * i);
+//            //添加到集合
+//            lyrics.add(lyric);
+//            //重新创建新对象
+//            lyric = new Lyric();
+//        }
     }
 
 
@@ -106,5 +107,31 @@ public class LyricShowView extends TextView {
         } else {
             canvas.drawText("没有找到歌词...", getWidth() / 2, getHeight() / 2, paintGreen);
         }
+    }
+
+    /**
+     * 根据播放的位置查找或者计算出当前该高亮显示的是哪一句
+     * 并且得到这一句对应的相关信息
+     */
+    public void setNextShowLyric(int currentPosition) {
+        this.currentPosition = currentPosition;
+        if (lyrics == null || lyrics.size() == 0)
+            return;
+
+        for (int i = 1; i < lyrics.size(); i++) {
+
+            if (currentPosition < lyrics.get(i).getTimePoint()) {
+                int tempIndex = i - 1;
+                if (currentPosition >= lyrics.get(tempIndex).getTimePoint()) {
+                    //中间高亮显示的哪一句
+                    index = tempIndex;
+                }
+            }
+        }
+        invalidate();
+    }
+
+    public void setLyrics(ArrayList<Lyric> lyrics) {
+        this.lyrics = lyrics;
     }
 }
