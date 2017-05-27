@@ -14,6 +14,6 @@ public class MyApplication extends Application {
         super.onCreate();
         x.Ext.init(this);
         x.Ext.setDebug(BuildConfig.DEBUG);
-        SpeechUtility.createUtility(this, SpeechConstant.APPID +"=5928e7f4");
+        SpeechUtility.createUtility(this, SpeechConstant.APPID +"=5928ea01");
     }
 }
