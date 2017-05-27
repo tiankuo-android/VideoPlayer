@@ -2,6 +2,7 @@ package com.atguigu.tiankuo.videoplayer.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,6 +22,9 @@ import com.iflytek.cloud.ui.RecognizerDialogListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,6 +35,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView ivVoice;
     private TextView tvGo;
     private ListView lv;
+    public static final String NET_SEARCH_URL = "http://hot.news.cntv.cn/index.php?controller=list&action=searchList&sort=date&n=20&wd=";
+    private String url;
 
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
 
@@ -59,9 +65,34 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 showVoiceDialog();
                 break;
             case R.id.tv_go:
-
+                toSearch();
                 break;
         }
+    }
+
+    private void toSearch() {
+        RequestParams request = new RequestParams(url);
+        x.http().get(request, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Log.e("TAG", "请求成功-result=="+result);
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Log.e("TAG", "请求失败=="+ex.getMessage());
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
     }
 
     private void showVoiceDialog() {
@@ -127,7 +158,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             resultBuffer.append(mIatResults.get(key));
         }
 
-        etSousuo.setText(resultBuffer.toString());
+        String stri = resultBuffer.toString();
+        stri = stri.replace("。","");
+
+        etSousuo.setText(stri);
         etSousuo.setSelection(etSousuo.length());
     }
 }
