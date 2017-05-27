@@ -13,32 +13,14 @@ import java.util.Comparator;
 
 public class LyricsUtils {
 
+    private boolean isLyric = false;
     private ArrayList<Lyric> lyrics;
-
-    /**
-     * 得到歌词列表
-     *
-     * @return
-     */
     public ArrayList<Lyric> getLyrics() {
         return lyrics;
     }
-
-    /**
-     * 是否歌词存在
-     * @return
-     */
     public boolean isLyric() {
         return isLyric;
     }
-
-    private boolean isLyric = false;
-
-    /**
-     * 解析歌词，把解析好的放入集合中
-     *
-     * @param file
-     */
     public void readFile(File file) {
         if (file == null || !file.exists()) {
             //文件不存在
@@ -98,11 +80,6 @@ public class LyricsUtils {
 
     }
 
-    /**
-     * 解析歌词-某一行
-     *
-     * @param line [02:04.12][03:37.32][00:59.73]我在这里欢笑
-     */
     private void analyzeLyric(String line) {
         int pos1 = line.indexOf("[");//0
         int pos2 = line.indexOf("]");//9//如果没有就返回-1
@@ -128,7 +105,7 @@ public class LyricsUtils {
 
                 if (pos1 == 0 && pos2 != -1) {//至少还有一句
 
-                    timeStr = line.substring(pos1 + 1, pos2);//03:37.32-->00:59.73
+                    timeStr = content.substring(pos1 + 1, pos2);//03:37.32-->00:59.73
                     //解析第1句
                     timeLongs[i] = stringToLong(timeStr);//02:04.12转换成long的毫秒类型-->00:59.73转换成毫秒
 
@@ -139,9 +116,6 @@ public class LyricsUtils {
 
                 }
             }
-
-
-            ////装long类型的时间戳
 
             for (int j = 0; j < timeLongs.length; j++) {
                 if (timeLongs[j] != 0) {
@@ -161,12 +135,6 @@ public class LyricsUtils {
 
     }
 
-    /**
-     * 把02:04.12转换成long的毫秒类型
-     *
-     * @param timeStr 02:04.12
-     * @return
-     */
     private long stringToLong(String timeStr) {
         long result = -1;
         try {
@@ -189,12 +157,6 @@ public class LyricsUtils {
         return result;
     }
 
-    /**
-     * 判断有多少句歌词
-     *
-     * @param line [02:04.12][03:37.32][00:59.73]我在这里欢笑
-     * @return
-     */
     private int getCountTag(String line) {
         int result = 1;
         String[] s1 = line.split("\\[");
