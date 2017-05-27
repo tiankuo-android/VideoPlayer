@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -29,6 +30,7 @@ import com.atguigu.tiankuo.videoplayer.domain.MediaItem;
 import com.atguigu.tiankuo.videoplayer.service.MusicPlayService;
 import com.atguigu.tiankuo.videoplayer.utils.LyricsUtils;
 import com.atguigu.tiankuo.videoplayer.utils.Utils;
+import com.atguigu.tiankuo.videoplayer.view.BaseVisualizerView;
 import com.atguigu.tiankuo.videoplayer.view.LyricShowView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -61,6 +63,8 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     private Utils utils;
     private boolean notification;
     private LyricShowView lyric_show_view;
+    private BaseVisualizerView visualizerview;
+    private Visualizer mVisualizer;
 
     private final static int PROGRESS = 0;
     private static final int SHOW_LYRIC = 1;
@@ -160,7 +164,24 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             e.printStackTrace();
         }
         handler.sendEmptyMessage(PROGRESS);
+        setupVisualizerFxAndUi();
 //        handler.sendEmptyMessage(SHOW_LYRIC);
+    }
+
+    private void setupVisualizerFxAndUi() {
+        int audioSessionid = 0;
+        try {
+            audioSessionid = service.getAudioSessionId();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        System.out.println("audioSessionid==" + audioSessionid);
+        mVisualizer = new Visualizer(audioSessionid);
+        // 参数内必须是2的位数
+        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        // 设置允许波形表示，并且捕获它
+        visualizerview.setVisualizer(mVisualizer);
+        mVisualizer.setEnabled(true);
     }
 
     private Object data;
@@ -185,6 +206,8 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         btnNext = (Button) findViewById(R.id.btn_next);
         btnLyric = (Button) findViewById(R.id.btn_lyric);
         lyric_show_view = (LyricShowView) findViewById(R.id.lyric_show_view);
+        visualizerview = (BaseVisualizerView) findViewById(R.id.base_visualizer);
+
 
         btnPlaymode.setOnClickListener(this);
         btnPre.setOnClickListener(this);
@@ -306,6 +329,14 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         Intent intent = new Intent(this, MusicPlayService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         startService(intent);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing()) {
+            mVisualizer.release();
+        }
     }
 
     @Override

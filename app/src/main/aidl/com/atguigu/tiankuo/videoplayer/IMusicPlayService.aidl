@@ -52,5 +52,7 @@ interface IMusicPlayService {
 
                 void setPlaymode(int playmode);
 
+                int getAudioSessionId();
+
 
 }
