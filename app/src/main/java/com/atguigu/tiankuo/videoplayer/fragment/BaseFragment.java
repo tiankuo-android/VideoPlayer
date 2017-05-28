@@ -16,7 +16,8 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getContext();
+//        context = getContext();
+        context = getActivity();
         Log.e("TAG","BaseFragment-onCreate");
     }
 
