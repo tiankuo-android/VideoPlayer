@@ -188,6 +188,4 @@ public class NetVideoPager extends BaseFragment {
             adapter.notifyDataSetChanged();
         }
     }
-
-
 }
