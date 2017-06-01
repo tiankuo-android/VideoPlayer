@@ -160,6 +160,7 @@ public class NetAudioPager extends BaseFragment {
 
     private List<NetAudioBean.ListBean> parsedJson(String json) {
         NetAudioBean netAudioBean = new Gson().fromJson(json, NetAudioBean.class);
+        Log.e("TAG","------netAudioBean-----" + netAudioBean);
         return netAudioBean.getList();
     }
 

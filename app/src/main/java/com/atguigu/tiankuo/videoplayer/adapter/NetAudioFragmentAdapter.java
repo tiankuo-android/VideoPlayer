@@ -219,7 +219,6 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         ImageHolder(View convertView) {
             super(convertView);
-            //中间公共部分 -所有的都有
             tvContext = (TextView) convertView.findViewById(R.id.tv_context);
             ivImageIcon = (ImageView) convertView.findViewById(R.id.iv_image_icon);
 
@@ -227,13 +226,10 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         public void setData(NetAudioBean.ListBean mediaItem) {
             super.setData(mediaItem);
-            //设置文本-所有的都有
             tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
-            //图片特有的
 
             ivImageIcon.setImageResource(R.drawable.bg_item);
             if (mediaItem.getImage() != null && mediaItem.getImage() != null && mediaItem.getImage().getSmall() != null) {
-//                Glide.with(mContext).load(mediaItem.getImage().getDownload_url().get(0)).placeholder(R.drawable.bg_item).error(R.drawable.bg_item).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivImageIcon);
                 Picasso.with(mContext)
                         .load(mediaItem.getImage().getDownload_url().get(0))
                         .placeholder(R.drawable.video_default)
@@ -250,7 +246,6 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         TextHolder(View convertView) {
             super(convertView);
-            //中间公共部分 -所有的都有
             tvContext = (TextView) convertView.findViewById(R.id.tv_context);
 
 
@@ -258,7 +253,6 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         public void setData(NetAudioBean.ListBean mediaItem) {
             super.setData(mediaItem);
-            //设置文本-所有的都有
             tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
         }
     }
@@ -270,16 +264,12 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         GifHolder(View convertView) {
             super(convertView);
-            //中间公共部分 -所有的都有
             tvContext = (TextView) convertView.findViewById(R.id.tv_context);
             ivImageGif = (ImageView) convertView.findViewById(R.id.iv_image_gif);
 
             imageOptions = new ImageOptions.Builder()
-                    //包裹类型
                     .setSize(ViewGroup.LayoutParams.WRAP_CONTENT, -2)
-                    //设置圆角
-//                    .setRadius(DensityUtil.dip2px(5))
-                    .setIgnoreGif(false)//是否忽略gif图。false表示不忽略。不写这句，默认是true
+                    .setIgnoreGif(false)
                     .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                     .setLoadingDrawableId(R.drawable.video_default)
                     .setFailureDrawableId(R.drawable.video_default)
@@ -289,12 +279,8 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
         public void setData(NetAudioBean.ListBean mediaItem) {
             super.setData(mediaItem);
-            //设置文本-所有的都有
             tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
-
-            //下面是gif
             if (mediaItem.getGif() != null && mediaItem.getGif() != null && mediaItem.getGif().getImages() != null) {
-//                Glide.with(context).load(mediaItem.getGif().getImages().get(0)).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(ivImageGif);
                 x.image().bind(ivImageGif, mediaItem.getGif().getImages().get(0), imageOptions);
             }
 
@@ -306,7 +292,7 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
         Button btnInstall;
 
         ADHolder(View convertView) {
-            //中间公共部分 -所有的都有
+
             tvContext = (TextView) convertView.findViewById(R.id.tv_context);
             btnInstall = (Button) convertView.findViewById(R.id.btn_install);
             ivImageIcon = (ImageView) convertView.findViewById(R.id.iv_image_icon);
@@ -327,12 +313,12 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
         LinearLayout llDownload;
 
         public BaseViewHolder(View convertView) {
-            //公共的
+
             ivHeadpic = (ImageView) convertView.findViewById(R.id.iv_headpic);
             tvName = (TextView) convertView.findViewById(R.id.tv_name);
             tvTimeRefresh = (TextView) convertView.findViewById(R.id.tv_time_refresh);
             ivRightMore = (ImageView) convertView.findViewById(R.id.iv_right_more);
-            //bottom
+
             ivVideoKind = (ImageView) convertView.findViewById(R.id.iv_video_kind);
             tvVideoKindText = (TextView) convertView.findViewById(R.id.tv_video_kind_text);
             tvShenheDingNumber = (TextView) convertView.findViewById(R.id.tv_shenhe_ding_number);
@@ -351,8 +337,6 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
             tvTimeRefresh.setText(mediaItem.getPasstime());
 
-            //设置标签
-//            List<NetAudioBean.ListBean.TagsEntity> tagsEntities = mediaItem.getTags();
             List<NetAudioBean.ListBean.TagsBean> tagsEntities = mediaItem.getTags();
             if (tagsEntities != null && tagsEntities.size() > 0) {
                 StringBuffer buffer = new StringBuffer();
@@ -361,8 +345,6 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
                 }
                 tvVideoKindText.setText(buffer.toString());
             }
-
-            //设置点赞，踩,转发
 
             tvShenheDingNumber.setText(mediaItem.getUp());
             tvShenheCaiNumber.setText(mediaItem.getDown() + "");

@@ -39,4 +39,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'fm.jiecao:jiecaovideoplayer:4.8.3'
     compile project(':PhotoView_library')
+    compile 'com.android.support:recyclerview-v7:24.2.1'
 }
