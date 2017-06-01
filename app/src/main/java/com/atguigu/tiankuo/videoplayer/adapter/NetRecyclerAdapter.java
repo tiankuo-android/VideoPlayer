@@ -107,7 +107,6 @@ public class NetRecyclerAdapter extends RecyclerView.Adapter{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        int itemtype = getItemViewType(position);
         if (getItemViewType(position) == TYPE_VIDEO) {
             VideoHoder videoHoder = (VideoHoder) holder;
             videoHoder.setData(listDatas.get(position));
